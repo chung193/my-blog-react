@@ -1,8 +1,8 @@
-import Logo from './logo';
+import Logo from './Logo';
 function Header() {
     return (
-        <header className="aspect-3/2 border-b border-gray-200 max-h-16">
-            <div className="max-w-4xl w-4xl mx-auto container mx-auto flex items-center justify-between">
+        <header className="border-b border-gray-200">
+            <div className="max-w-4xl w-full mx-auto h-16 flex items-center justify-between px-4 sm:px-6">
                 <div className="flex items-center space-x-2">
                     <Logo />
                 </div>

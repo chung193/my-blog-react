@@ -1,6 +1,6 @@
 const Waiting = () => {
     return (
-        <div className="max-w-4xl w-4xl mx-auto aspect-3/2 py-4 flex justify-between max-h-16">
+        <div className="max-w-4xl w-full mx-auto py-4 px-4 sm:px-6">
             <p>Đợi tí...</p>
         </div>
     )

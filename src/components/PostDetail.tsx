@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import apiService from '../services/common'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Comment from './Comment'
 import { Helmet } from "react-helmet-async";
 import Waiting from './Waiting';
@@ -19,7 +19,7 @@ function PostDetail() {
     }, [id])
 
     return (
-        <div className="max-w-4xl w-4xl mx-auto mb-4">
+        <div className="max-w-4xl w-full mx-auto mb-4 break-words">
             {post && (
                 <Helmet>
                     <title>{post.name} || Trăn trở của 1 người khó ở</title>
@@ -31,12 +31,19 @@ function PostDetail() {
             {!post && <Waiting />}
             {post &&
                 <div>
-                    <h6 className='text-1xl mt-2 mb-2'><strong><a href="">{post.category?.name || "Uncategorized"}</a></strong></h6>
-                    <h1 className='text-3xl mt-2 mb-2'>{post.name}</h1>
+                    <h6 className='text-1xl mt-2 mb-2'>
+                        <strong>
+                            <a href={`/category/${post.category?.id}`}>{post.category?.name || "Uncategorized"}</a>
+                        </strong>
+                    </h6>
+                    <h1 className='text-2xl sm:text-3xl mt-2 mb-2 leading-tight'>{post.name}</h1>
                     <p className="mt-2 text-gray-700 font-bold my-2">{post.description}</p>
-                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                    <p className="mt-2 text-gray-700"><strong>Author:</strong> {post.user?.name || "Unknown Author"}</p>
-                    <Comment comments={post.comments || []} />
+                    <div
+                        className="[&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
+                    <p className="mt-2 text-gray-700"><strong>Author:</strong> <a href={`/user/${post.user?.id}`}>{post.user?.name || "Unknown Author"}</a></p>
+                    <Comment comments={post.comments || []} postId={id || ""} />
                 </div>
             }
         </div>

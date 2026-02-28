@@ -22,7 +22,7 @@ export default function DonateButton({
     return (
         <div
             className={`
-                fixed top-20 right-6 z-50
+                fixed bottom-20 right-3 sm:top-20 sm:bottom-auto sm:right-6 z-50
                 transition-all duration-500 ease-in-out
                 ${visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}
             `}
@@ -30,6 +30,7 @@ export default function DonateButton({
             {/* Tooltip */}
             {showTooltip && (
                 <div className="
+                    hidden sm:block
                     absolute right-20 top-1/2 -translate-y-1/2
                     bg-gray-800 text-white text-xs
                     px-3 py-1.5 rounded-lg whitespace-nowrap
@@ -50,7 +51,7 @@ export default function DonateButton({
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
                 className="
-            block w-20 h-20 
+            block w-14 h-14 sm:w-20 sm:h-20
             ring-2 ring-white
             overflow-hidden cursor-pointer
             transition-all duration-200
@@ -59,7 +60,7 @@ export default function DonateButton({
                 <img
                     src={imageUrl}
                     alt="Donate"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-2xl"
                 />
             </a>
 

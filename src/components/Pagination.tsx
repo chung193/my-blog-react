@@ -31,8 +31,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     };
 
     return (
-        <div className="max-w-4xl w-4xl mx-auto aspect-3/2 py-4 flex justify-between max-h-16">
-            <div className="flex items-center gap-1">
+        <div className="max-w-4xl w-full mx-auto py-4 overflow-x-auto">
+            <div className="w-max min-w-full flex items-center justify-center gap-1">
                 {/* Prev */}
                 <button
                     onClick={() => onPageChange(currentPage - 1)}

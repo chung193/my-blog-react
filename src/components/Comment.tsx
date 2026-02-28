@@ -86,7 +86,7 @@ const CommentForm = ({
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
@@ -116,7 +116,7 @@ const CommentItem = ({ comment, postId, depth = 0, onReplyAdded }: CommentItemPr
     };
 
     return (
-        <div className={`${depth > 0 ? "ml-8 border-l-2 border-gray-100 pl-4" : ""}`}>
+        <div className={`${depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-gray-100 pl-3 sm:pl-4" : ""}`}>
             <div className="flex items-start gap-3 mb-1">
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm shrink-0">
                     {comment.user?.name?.charAt(0).toUpperCase()}
@@ -127,7 +127,7 @@ const CommentItem = ({ comment, postId, depth = 0, onReplyAdded }: CommentItemPr
                         <p className="text-sm font-semibold text-gray-800">{comment.user?.name}</p>
                         <p className="text-sm text-gray-700 mt-0.5">{comment.body}</p>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 ml-1">
+                    <div className="flex flex-wrap items-center gap-3 mt-1 ml-1">
                         <p className="text-xs text-gray-400">{formatDate(comment.created_at)}</p>
                         {depth < 3 && (
                             <button
@@ -143,7 +143,7 @@ const CommentItem = ({ comment, postId, depth = 0, onReplyAdded }: CommentItemPr
 
             {/* Form reply với animation smooth */}
             <div
-                className={`ml-11 overflow-hidden transition-all duration-300 ease-in-out ${showReplyForm ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                className={`ml-0 sm:ml-11 overflow-hidden transition-all duration-300 ease-in-out ${showReplyForm ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
             >
                 <CommentForm
