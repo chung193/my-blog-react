@@ -1,27 +1,27 @@
-import { authInstance } from "./axios";
+import { authInstance, instance } from "./axios";
 
 const apiService = {
-    get: (url, params = {}) => authInstance.get(url, { params }),
-    post: (url, data = {}) => authInstance.post(url, data),
-    postWithMedia: (url, formData = {}) => authInstance.post(url, formData, {
+    get: (url, params = {}) => instance.get(url, { params }),
+    post: (url, data = {}) => instance.post(url, data),
+    postWithMedia: (url, formData = {}) => instance.post(url, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     }),
     putWithMedia: (url, formData = {}) => {
         formData.append('_method', 'PUT');
-        return authInstance.post(url, formData, {
+        return instance.post(url, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
     },
-    profile: () => authInstance.get('profile'),
-    put: (url, data = {}) => authInstance.put(url, data),
-    patch: (url, data = {}) => authInstance.patch(url, data),
-    delete: (url) => authInstance.delete(url),
+    profile: () => instance.get('profile'),
+    put: (url, data = {}) => instance.put(url, data),
+    patch: (url, data = {}) => instance.patch(url, data),
+    delete: (url) => instance.delete(url),
     exportExcel: async (url, data = null) => {
-        authInstance.post(url, data,
+        instance.post(url, data,
             {
                 responseType: 'blob',
             }

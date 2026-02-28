@@ -26,7 +26,7 @@ function HomePage() {
 
     return (
         <>
-            {posts.map((post) => (
+            {posts && posts.map((post) => (
                 <Post
                     key={post.id}
                     id={post.id}
