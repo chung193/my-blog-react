@@ -26,6 +26,9 @@ function HomePage() {
 
     return (
         <>
+            <h1 className="max-w-4xl w-full mx-auto mb-4 text-2xl sm:text-3xl font-bold text-gray-800">
+                Mới nhất
+            </h1>
             {posts && posts.map((post) => (
                 <Post
                     key={post.slug || post.id}
@@ -35,6 +38,8 @@ function HomePage() {
                     description={post.description}
                     views={post.views}
                     comments={post.comments || 0}
+                    categoryName={post.category?.name || "Uncategorized"}
+                    categorySlug={post.category?.slug || "uncategorized"}
                 />
             ))}
             <Pagination

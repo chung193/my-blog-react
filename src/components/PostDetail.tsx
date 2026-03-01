@@ -103,7 +103,9 @@ function PostDetail() {
                 <div>
                     <h6 className='text-1xl mt-2 mb-2 text-gray-500 hover:text-gray-700'>
                         <strong>
-                            <a href={`/category/${post.category?.slug || post.category?.id}`}>{post.category?.name || "Uncategorized"}</a>
+                            <a href={`/category/${post.category?.slug || post.category?.id}`} className='inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700 transition-colors hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-300'>
+                                {post.category?.name || "Uncategorized"}
+                            </a>
                         </strong>
                     </h6>
                     <h1 className='text-2xl sm:text-3xl mt-2 mb-2 font-bold leading-tight'>{post.name}</h1>
@@ -113,7 +115,22 @@ function PostDetail() {
                         className="post-content prose prose-sm sm:prose max-w-none overflow-hidden [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:overflow-x-auto"
                         dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ') }}
                     />
-                    <p className="mt-2 text-gray-700"><strong>Author:</strong> <a href={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}>{post.user?.name || "Unknown Author"}</a></p>
+                    <div className="mt-4 mb-1">
+                        <a
+                            href={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}
+                            className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-white to-gray-50 px-3 py-2 transition-colors hover:from-sky-50 hover:to-white"
+                        >
+                            <div className="h-9 w-9 rounded-full bg-sky-100 text-sky-700 font-semibold flex items-center justify-center">
+                                {(post.user?.name?.charAt(0) || "U").toUpperCase()}
+                            </div>
+                            <div className="leading-tight">
+                                <p className="text-[11px] uppercase tracking-wide text-sky-600 font-semibold">Tác giả</p>
+                                <p className="text-sm font-medium text-gray-800 hover:text-sky-800">
+                                    {post.user?.name || "Unknown Author"}
+                                </p>
+                            </div>
+                        </a>
+                    </div>
                     <Comment key={slug} comments={comments} postSlug={slug || ""} />
                 </div>
             }
