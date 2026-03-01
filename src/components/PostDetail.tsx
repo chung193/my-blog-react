@@ -8,15 +8,18 @@ import Waiting from './Waiting';
 interface User {
     id: number;
     name: string;
+    slug?: string;
 }
 
 interface Category {
     id: number;
     name: string;
+    slug?: string;
 }
 
 interface PostDetailData {
     id: number;
+    slug?: string;
     name: string;
     description: string;
     thumbnail?: string;
@@ -27,13 +30,24 @@ interface PostDetailData {
     comments?: unknown;
 }
 
+const toSlug = (value: string): string => {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+}
+
 function PostDetail() {
-    const { id } = useParams()
+    const { slug } = useParams()
     const [post, setPost] = useState<PostDetailData | null>(null)
     const [comments, setComments] = useState<unknown[]>([])
 
     useEffect(() => {
-        if (!id) {
+        if (!slug) {
             setPost(null)
             setComments([])
             return
@@ -41,7 +55,7 @@ function PostDetail() {
 
         let cancelled = false
 
-        apiService.get(`client/post/${id}`)
+        apiService.get(`client/post/${slug}`)
             .then(response => {
                 if (cancelled) return
 
@@ -56,7 +70,7 @@ function PostDetail() {
                 console.error("Error fetching post:", error)
             })
 
-        apiService.get(`client/post/${id}/comments`)
+        apiService.get(`client/post/${slug}/comments`)
             .then(response => {
                 if (cancelled) return
                 const serverComments = response?.data?.data
@@ -72,7 +86,7 @@ function PostDetail() {
         return () => {
             cancelled = true
         }
-    }, [id])
+    }, [slug])
 
     return (
         <div className="max-w-4xl w-full mx-auto mb-4 break-words min-w-0">
@@ -89,7 +103,7 @@ function PostDetail() {
                 <div>
                     <h6 className='text-1xl mt-2 mb-2 text-gray-500 hover:text-gray-700'>
                         <strong>
-                            <a href={`/category/${post.category?.id}`}>{post.category?.name || "Uncategorized"}</a>
+                            <a href={`/category/${post.category?.slug || post.category?.id}`}>{post.category?.name || "Uncategorized"}</a>
                         </strong>
                     </h6>
                     <h1 className='text-2xl sm:text-3xl mt-2 mb-2 font-bold leading-tight'>{post.name}</h1>
@@ -99,8 +113,8 @@ function PostDetail() {
                         className="post-content prose prose-sm sm:prose max-w-none overflow-hidden [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:overflow-x-auto"
                         dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ') }}
                     />
-                    <p className="mt-2 text-gray-700"><strong>Author:</strong> <a href={`/user/${post.user?.id}`}>{post.user?.name || "Unknown Author"}</a></p>
-                    <Comment key={id} comments={comments} postId={id || ""} />
+                    <p className="mt-2 text-gray-700"><strong>Author:</strong> <a href={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}>{post.user?.name || "Unknown Author"}</a></p>
+                    <Comment key={slug} comments={comments} postSlug={slug || ""} />
                 </div>
             }
         </div>

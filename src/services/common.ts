@@ -2,7 +2,9 @@ import { authInstance, instance } from "./axios";
 
 const apiService = {
     get: (url, params = {}) => instance.get(url, { params }),
+    authGet: (url, params = {}) => authInstance.get(url, { params }),
     post: (url, data = {}) => instance.post(url, data),
+    authPost: (url, data = {}) => authInstance.post(url, data),
     postWithMedia: (url, formData = {}) => instance.post(url, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'

@@ -10,10 +10,15 @@ function PostWithUser() {
     const [posts, setPosts] = useState(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const { id } = useParams()
+    const { slug } = useParams()
 
     useEffect(() => {
-        apiService.get(`client/post?user_id=${id}&page=${page}`)
+        setPosts(null);
+        setPage(1);
+    }, [slug]);
+
+    useEffect(() => {
+        apiService.get(`client/post?user_slug=${slug}&page=${page}`)
             .then(response => {
                 setPosts(response.data.data);
                 setPage(response.data.meta.current_page);
@@ -22,7 +27,7 @@ function PostWithUser() {
             .catch(error => {
                 console.error("Error fetching posts:", error);
             });
-    }, [page]);
+    }, [slug, page]);
 
     if (!posts) return <Waiting />;
 
@@ -30,8 +35,8 @@ function PostWithUser() {
         <>
             {posts.map((post) => (
                 <Post
-                    key={post.id}
-                    id={post.id}
+                    key={post.slug || post.id}
+                    slug={post.slug || String(post.id)}
                     name={post.name}
                     date={formatDate(post.created_at)}
                     description={post.description}
@@ -49,3 +54,4 @@ function PostWithUser() {
 }
 
 export default PostWithUser;
+

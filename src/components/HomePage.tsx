@@ -28,8 +28,8 @@ function HomePage() {
         <>
             {posts && posts.map((post) => (
                 <Post
-                    key={post.id}
-                    id={post.id}
+                    key={post.slug || post.id}
+                    slug={post.slug || String(post.id)}
                     name={post.name}
                     date={formatDate(post.created_at)}
                     description={post.description}
