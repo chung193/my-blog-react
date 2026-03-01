@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import apiService from "../services/common";
 import { formatDate } from "../utils/formatDate";
 
@@ -15,6 +15,16 @@ interface CommentType {
     created_at: string;
 }
 
+interface ApiCommentShape {
+    id?: number;
+    body?: string;
+    created_at?: string;
+    user?: User | null;
+    name?: string;
+    replies?: ApiCommentShape[] | null;
+    children?: ApiCommentShape[] | null;
+}
+
 interface CommentItemProps {
     comment: CommentType;
     postId: number | string;
@@ -23,9 +33,45 @@ interface CommentItemProps {
 }
 
 interface CommentProps {
-    comments: CommentType[];
+    comments: unknown;
     postId: number | string;
 }
+
+const normalizeComment = (input: unknown): CommentType | null => {
+    if (!input || typeof input !== "object") {
+        return null;
+    }
+
+    const raw = input as ApiCommentShape;
+    if (typeof raw.id !== "number" || typeof raw.body !== "string") {
+        return null;
+    }
+
+    const fallbackName = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : "Ẩn danh";
+    const user =
+        raw.user && typeof raw.user.id === "number" && typeof raw.user.name === "string"
+            ? raw.user
+            : { id: 0, name: fallbackName };
+
+    const nested = Array.isArray(raw.replies) ? raw.replies : Array.isArray(raw.children) ? raw.children : [];
+    const replies = nested.map(normalizeComment).filter((item): item is CommentType => item !== null);
+
+    return {
+        id: raw.id,
+        body: raw.body,
+        created_at: raw.created_at ?? new Date().toISOString(),
+        user,
+        replies,
+    };
+};
+
+const normalizeComments = (input: unknown): CommentType[] => {
+    if (!Array.isArray(input)) {
+        return [];
+    }
+
+    return input.map(normalizeComment).filter((item): item is CommentType => item !== null);
+};
 
 const CommentForm = ({
     postId,
@@ -54,12 +100,21 @@ const CommentForm = ({
         try {
             setLoading(true);
             setError("");
-            const res = await apiService.post(`client/posts/${postId}/comments`, {
-                name,
-                body,
-                parent_id: parentId,
-            });
-            onSuccess(res.data.data);
+            const payload: { name: string; body: string; parent_id?: number } = {
+                name: name.trim(),
+                body: body.trim(),
+            };
+            if (parentId !== null) {
+                payload.parent_id = parentId;
+            }
+
+            const res = await apiService.post(`client/post/${postId}/comments`, payload);
+            const createdComment = normalizeComment(res?.data?.data);
+            if (!createdComment) {
+                throw new Error("Invalid comment response");
+            }
+
+            onSuccess(createdComment);
             setName("");
             setBody("");
         } catch {
@@ -119,7 +174,7 @@ const CommentItem = ({ comment, postId, depth = 0, onReplyAdded }: CommentItemPr
         <div className={`${depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-gray-100 pl-3 sm:pl-4" : ""}`}>
             <div className="flex items-start gap-3 mb-1">
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm shrink-0">
-                    {comment.user?.name?.charAt(0).toUpperCase()}
+                    {comment.user?.name?.charAt(0).toUpperCase() || "?"}
                 </div>
 
                 <div className="flex-1">
@@ -174,7 +229,11 @@ const CommentItem = ({ comment, postId, depth = 0, onReplyAdded }: CommentItemPr
 };
 
 const Comment = ({ comments: initialComments, postId }: CommentProps) => {
-    const [comments, setComments] = useState<CommentType[]>(initialComments);
+    const [comments, setComments] = useState<CommentType[]>(() => normalizeComments(initialComments));
+
+    useEffect(() => {
+        setComments(normalizeComments(initialComments));
+    }, [initialComments, postId]);
 
     const addReplyToTree = (nodes: CommentType[], parentId: number, reply: CommentType): CommentType[] => {
         return nodes.map((node) => {
