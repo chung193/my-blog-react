@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 
 interface DonateButtonProps {
     imageUrl: string;
@@ -32,12 +32,10 @@ export default function DonateButton({
                 <div className="
                     hidden sm:block
                     absolute right-20 top-1/2 -translate-y-1/2
-                    bg-gray-800 text-white text-xs
-                    px-3 py-1.5 rounded-lg whitespace-nowrap
-                    shadow-lg
+                    text-white text-xs
+                    px-3 py-1.5 whitespace-nowrap
                     before:content-[''] before:absolute before:left-full before:top-1/2
-                    before:-translate-y-1/2 before:border-4
-                    before:border-transparent before:border-l-gray-800
+                    before:-translate-y-1/2
                 ">
                     {tooltip}
                 </div>
@@ -52,7 +50,7 @@ export default function DonateButton({
                 onMouseLeave={() => setShowTooltip(false)}
                 className="
             block w-14 h-14 sm:w-20 sm:h-20
-            ring-2 ring-white
+            
             overflow-hidden cursor-pointer
             transition-all duration-200
             "
@@ -60,7 +58,7 @@ export default function DonateButton({
                 <img
                     src={imageUrl}
                     alt="Donate"
-                    className="w-full h-full object-cover rounded-2xl"
+                    className="w-full h-full object-cover"
                 />
             </a>
 
@@ -75,3 +73,4 @@ export default function DonateButton({
         </div>
     );
 }
+

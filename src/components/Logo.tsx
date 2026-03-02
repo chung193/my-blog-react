@@ -1,4 +1,4 @@
-import Typewriter from "typewriter-effect";
+﻿import Typewriter from "typewriter-effect";
 import { Rocket } from "lucide-react";
 import { useState } from "react";
 
@@ -20,7 +20,7 @@ function Logo() {
                     <Typewriter
                         onInit={(typewriter) => {
                             typewriter
-                                .typeString('<span class="text-blue-600">Explore</span>')
+                                .typeString('<span class="text-sky-700">Explore</span>')
                                 .pauseFor(1500)
                                 .deleteAll()
                                 .typeString(
@@ -41,7 +41,7 @@ function Logo() {
                             delay: 50,
                             deleteSpeed: 30,
                             loop: true,
-                            cursor: "", // 🔥 tắt cursor mặc định
+                            cursor: "", // turn off default cursor
                         }}
                     />
 
@@ -49,8 +49,8 @@ function Logo() {
                         <Rocket className="ml-2 w-4 h-4 text-pink-500 animate-pulse" />
                     )}
 
-                    {/* Cursor custom đặt sau cùng */}
-                    <span className="ml-1 animate-pulse">|</span>
+                    {/* custom cursor displayed at the end */}
+                    <span className="ml-1 animate-pulse text-slate-700 dark:text-slate-200">|</span>
                 </div>
             </a>
         </div>

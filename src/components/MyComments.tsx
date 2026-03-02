@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../services/common";
 import { formatDate } from "../utils/formatDate";
@@ -87,9 +87,9 @@ function MyComments() {
   if (!isAuthenticated()) {
     return (
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-xl font-semibold mb-2">Bình luận đã gửi</h1>
-        <p className="text-gray-600">
-          Vui lòng <Link to="/login" className="text-blue-600 hover:text-blue-700">đăng nhập</Link> để xem bình luận đã gửi.
+        <h1 className="text-xl font-semibold mb-2 dark:text-slate-100">Bình luận đã gửi</h1>
+        <p className="text-slate-600 dark:text-slate-300">
+          Vui lòng <Link to="/login" className="text-sky-700 hover:text-sky-800 dark:text-sky-300 dark:hover:text-sky-200">đăng nhập</Link> để xem bình luận đã gửi.
         </p>
       </div>
     );
@@ -101,19 +101,19 @@ function MyComments() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-xl font-semibold mb-4">Bình luận đã gửi</h1>
-      {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+      <h1 className="text-xl font-semibold mb-4 dark:text-slate-100">Bình luận đã gửi</h1>
+      {error && <p className="text-sm text-sky-700 mb-3">{error}</p>}
       {comments.length === 0 ? (
-        <p className="text-gray-500">Bạn chưa gửi bình luận nào.</p>
+        <p className="text-slate-500 dark:text-slate-400">Bạn chưa gửi bình luận nào.</p>
       ) : (
         <div className="space-y-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="border border-gray-200 rounded-lg p-4">
-              <p className="text-gray-800">{comment.body}</p>
-              <div className="mt-2 text-xs text-gray-500 flex items-center gap-3">
+            <div key={comment.id} className="border border-slate-200 rounded-lg p-4 dark:border-slate-700 dark:bg-slate-900/50">
+              <p className="text-slate-800 dark:text-slate-100">{comment.body}</p>
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-3">
                 <span>{formatDate(comment.created_at)}</span>
                 {comment.postSlug && (
-                  <Link to={`/posts/${comment.postSlug}`} className="text-blue-600 hover:text-blue-700">
+                  <Link to={`/posts/${comment.postSlug}`} className="text-sky-700 hover:text-sky-800 dark:text-sky-300 dark:hover:text-sky-200">
                     {comment.postName || "Xem bài viết"}
                   </Link>
                 )}
@@ -127,3 +127,4 @@ function MyComments() {
 }
 
 export default MyComments;
+

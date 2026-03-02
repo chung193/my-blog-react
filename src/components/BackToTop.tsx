@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 export default function BackToTop() {
@@ -21,7 +21,8 @@ export default function BackToTop() {
                 fixed bottom-6 right-6 z-50
                 flex items-center justify-center
                 w-11 h-11 rounded-full
-                bg-gray-600 hover:bg-gray-700
+                bg-slate-600 hover:bg-slate-700
+                dark:bg-slate-700 dark:hover:bg-slate-600
                 text-white shadow-lg
                 cursor-pointer
                 transition-all duration-300 ease-in-out

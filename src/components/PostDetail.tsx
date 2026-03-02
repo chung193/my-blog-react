@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import apiService from '../services/common'
 import { useParams } from 'react-router-dom'
 import Comment from './Comment'
@@ -9,6 +9,11 @@ interface User {
     id: number;
     name: string;
     slug?: string;
+    avatar?: string;
+    avatar_url?: string;
+    image?: string;
+    photo?: string;
+    profile_photo_url?: string;
 }
 
 interface Category {
@@ -24,10 +29,39 @@ interface PostDetailData {
     description: string;
     thumbnail?: string;
     avatar?: string;
+    user_avatar?: string;
     content: string;
     user?: User;
     category?: Category;
     comments?: unknown;
+}
+
+const getAuthorAvatar = (post: PostDetailData): string => {
+    const user = post.user;
+    return (
+        post.user_avatar ||
+        user?.avatar ||
+        user?.avatar_url ||
+        user?.image ||
+        user?.photo ||
+        user?.profile_photo_url ||
+        ""
+    );
+}
+
+interface ApiEnvelope<T> {
+    data?: T;
+}
+
+const getResponseData = <T,>(response: ApiEnvelope<T | ApiEnvelope<T>> | undefined): T | null => {
+    const payload = response?.data;
+    if (!payload) return null;
+
+    if (typeof payload === "object" && payload !== null && "data" in payload) {
+        return (payload as ApiEnvelope<T>).data ?? null;
+    }
+
+    return payload as T;
 }
 
 const toSlug = (value: string): string => {
@@ -59,9 +93,15 @@ function PostDetail() {
             .then(response => {
                 if (cancelled) return
 
-                const postData = response.data.data as PostDetailData
+                const postData = getResponseData<PostDetailData>(response)
+                if (!postData || typeof postData !== "object" || !("id" in postData)) {
+                    setPost(null)
+                    setComments([])
+                    return
+                }
+
                 setPost(postData)
-                setComments(Array.isArray(postData?.comments) ? postData.comments : [])
+                setComments(Array.isArray(postData.comments) ? postData.comments : [])
             })
             .catch(error => {
                 if (cancelled) return
@@ -73,7 +113,7 @@ function PostDetail() {
         apiService.get(`client/post/${slug}/comments`)
             .then(response => {
                 if (cancelled) return
-                const serverComments = response?.data?.data
+                const serverComments = getResponseData<unknown[]>(response)
                 if (Array.isArray(serverComments)) {
                     setComments(serverComments)
                 }
@@ -89,7 +129,7 @@ function PostDetail() {
     }, [slug])
 
     return (
-        <div className="max-w-4xl w-full mx-auto mb-4 break-words min-w-0">
+        <div className="max-w-4xl w-full mx-auto mb-4 break-words min-w-0 p-4 sm:p-5">
             {post && (
                 <Helmet>
                     <title>{post.name} || Trăn trở của 1 người khó ở</title>
@@ -100,39 +140,47 @@ function PostDetail() {
             )}
             {!post && <Waiting />}
             {post &&
-                <div>
-                    <h6 className='text-1xl mt-2 mb-2 text-gray-500 hover:text-gray-700'>
+                <article className="p-4 dark:border-slate-700">
+                    <h6 className='text-1xl mt-2 mb-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'>
                         <strong>
-                            <a href={`/category/${post.category?.slug || post.category?.id}`} className='inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700 transition-colors hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-300'>
+                            <a href={`/category/${post.category?.slug || post.category?.id}`} className='inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700 transition-colors hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-300 dark:border-slate-600 dark:bg-slate-800 dark:text-sky-300 dark:hover:border-slate-500 dark:hover:bg-slate-700'>
                                 {post.category?.name || "Uncategorized"}
                             </a>
                         </strong>
                     </h6>
-                    <h1 className='text-2xl sm:text-3xl mt-2 mb-2 font-bold leading-tight'>{post.name}</h1>
+                    <h1 className='text-2xl sm:text-3xl mt-2 mb-2 font-bold leading-tight dark:text-slate-100'>{post.name}</h1>
                     <img src={post.avatar} className="rounded-lg" />
-                    <p className="mt-2 text-gray-700 font-bold my-2">{post.description}</p>
+                    <p className="mt-2 text-slate-700 font-bold my-2 dark:text-slate-300">{post.description}</p>
                     <div
-                        className="post-content prose prose-sm sm:prose max-w-none overflow-hidden [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:overflow-x-auto"
+                        className="post-content prose prose-sm sm:prose max-w-none overflow-hidden dark:prose-invert [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:overflow-x-auto"
                         dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ') }}
                     />
                     <div className="mt-4 mb-1">
                         <a
                             href={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}
-                            className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-white to-gray-50 px-3 py-2 transition-colors hover:from-sky-50 hover:to-white"
+                            className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-white to-slate-50 px-3 py-2 transition-colors hover:from-sky-50 hover:to-white dark:from-slate-900 dark:to-slate-800 dark:hover:from-slate-800 dark:hover:to-slate-900"
                         >
-                            <div className="h-9 w-9 rounded-full bg-sky-100 text-sky-700 font-semibold flex items-center justify-center">
-                                {(post.user?.name?.charAt(0) || "U").toUpperCase()}
-                            </div>
+                            {getAuthorAvatar(post) ? (
+                                <img
+                                    src={getAuthorAvatar(post)}
+                                    alt={post.user?.name || "Author"}
+                                    className="h-9 w-9 rounded-full object-cover border border-sky-200 dark:border-slate-600"
+                                />
+                            ) : (
+                                <div className="h-9 w-9 rounded-full bg-sky-100 text-sky-700 font-semibold flex items-center justify-center dark:bg-slate-700 dark:text-slate-100">
+                                    {(post.user?.name?.charAt(0) || "U").toUpperCase()}
+                                </div>
+                            )}
                             <div className="leading-tight">
-                                <p className="text-[11px] uppercase tracking-wide text-sky-600 font-semibold">Tác giả</p>
-                                <p className="text-sm font-medium text-gray-800 hover:text-sky-800">
+                                <p className="text-[11px] uppercase tracking-wide text-sky-600 font-semibold dark:text-sky-300">Tác giả</p>
+                                <p className="text-sm font-medium text-slate-800 hover:text-sky-800 dark:text-slate-100 dark:hover:text-sky-200">
                                     {post.user?.name || "Unknown Author"}
                                 </p>
                             </div>
                         </a>
                     </div>
                     <Comment key={slug} comments={comments} postSlug={slug || ""} />
-                </div>
+                </article>
             }
         </div>
     );

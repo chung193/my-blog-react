@@ -1,4 +1,4 @@
-interface PaginationProps {
+﻿interface PaginationProps {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
@@ -39,7 +39,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                     disabled={currentPage === 1}
                     className="
                     flex items-center justify-center w-9 h-9 rounded-lg text-sm
-                    text-gray-500 hover:bg-gray-100 hover:text-gray-800
+                    text-slate-500 hover:bg-slate-100 hover:text-slate-800
+                    dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200
                     disabled:opacity-30 disabled:cursor-not-allowed
                     transition-all duration-150
                 "
@@ -53,8 +54,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 {/* Pages */}
                 {getPages().map((page, idx) =>
                     page === "..." ? (
-                        <span key={`dot-${idx}`} className="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">
-                            ···
+                        <span key={`dot-${idx}`} className="w-9 h-9 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
+                            ...
                         </span>
                     ) : (
                         <button
@@ -64,8 +65,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                             w-9 h-9 rounded-lg text-sm font-medium
                             transition-all duration-150
                             ${currentPage === page
-                                    ? "bg-gray-600 text-white shadow-sm shadow-gray-200"
-                                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                                    ? "bg-slate-600 text-white shadow-sm shadow-slate-200 dark:bg-slate-300 dark:text-slate-900 dark:shadow-none"
+                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                                 }
                         `}
                         >
@@ -80,7 +81,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                     disabled={currentPage === totalPages}
                     className="
                     flex items-center justify-center w-9 h-9 rounded-lg text-sm
-                    text-gray-500 hover:bg-gray-100 hover:text-gray-800
+                    text-slate-500 hover:bg-slate-100 hover:text-slate-800
+                    dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200
                     disabled:opacity-30 disabled:cursor-not-allowed
                     transition-all duration-150
                 "
@@ -94,3 +96,4 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         </div>
     );
 }
+

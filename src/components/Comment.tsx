@@ -32,7 +32,6 @@ interface CommentItemProps {
   depth?: number;
   canReply: boolean;
   isAuthenticated: boolean;
-  currentUserName: string;
   onReplyAdded: (parentId: number, reply: CommentType) => void;
 }
 
@@ -52,7 +51,7 @@ const normalizeComment = (input: unknown): CommentType | null => {
   }
 
   const fallbackName =
-    typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : "An danh";
+    typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : "Ẩn danh";
   const user =
     raw.user && typeof raw.user.id === "number" && typeof raw.user.name === "string"
       ? raw.user
@@ -149,15 +148,13 @@ const CommentForm = ({
   postSlug,
   parentId = null,
   isAuthenticated,
-  currentUserName,
   onSuccess,
   onCancel,
-  placeholder = "Viet binh luan...",
+  placeholder = "Viết bình luận...",
 }: {
   postSlug: string;
   parentId?: number | null;
   isAuthenticated: boolean;
-  currentUserName: string;
   onSuccess: (comment: CommentType) => void;
   onCancel?: () => void;
   placeholder?: string;
@@ -169,12 +166,12 @@ const CommentForm = ({
 
   const handleSubmit = async () => {
     if (!isAuthenticated && !guestName.trim()) {
-      setError("Vui long nhap ten khach.");
+      setError("Vui lòng nhập tên khách.");
       return;
     }
 
     if (!body.trim()) {
-      setError("Vui long nhap noi dung binh luan.");
+      setError("Vui lòng nhập nội dung bình luận.");
       return;
     }
 
@@ -208,7 +205,7 @@ const CommentForm = ({
       }
       setBody("");
     } catch {
-      setError("Gui that bai, vui long thu lai.");
+      setError("Gửi thất bại, vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -221,8 +218,8 @@ const CommentForm = ({
           type="text"
           value={guestName}
           onChange={(e) => setGuestName(e.target.value)}
-          placeholder="Nhap ten khach..."
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder="Nhập tên khách..."
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-sky-200 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
         />
       )}
       <textarea
@@ -230,23 +227,23 @@ const CommentForm = ({
         value={body}
         onChange={(e) => setBody(e.target.value)}
         rows={2}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-200"
+        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-200 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
       />
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-xs text-sky-700 mt-1">{error}</p>}
       <div className="flex flex-wrap gap-2 mt-2">
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="cursor-pointer px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+          className="cursor-pointer px-4 py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
         >
-          {loading ? "Dang gui..." : "Gui"}
+          {loading ? "Đang gửi..." : "Gửi"}
         </button>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="cursor-pointer px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm rounded-lg transition-colors"
+            className="cursor-pointer px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm rounded-lg transition-colors dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200"
           >
-            Huy
+            Hủy
           </button>
         )}
       </div>
@@ -260,7 +257,6 @@ const CommentItem = ({
   depth = 0,
   canReply,
   isAuthenticated,
-  currentUserName,
   onReplyAdded,
 }: CommentItemProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -271,25 +267,25 @@ const CommentItem = ({
   };
 
   return (
-    <div className={`${depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-gray-100 pl-3 sm:pl-4" : ""}`}>
+    <div className={`${depth > 0 ? "ml-4 sm:ml-8 border-l-2 border-slate-100 pl-3 sm:pl-4 dark:border-slate-700" : ""}`}>
       <div className="flex items-start gap-3 mb-1">
-        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm shrink-0">
+        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 font-semibold text-sm shrink-0 dark:bg-slate-700 dark:text-slate-100">
           {comment.user?.name?.charAt(0).toUpperCase() || "?"}
         </div>
 
         <div className="flex-1">
-          <div className="bg-gray-50 rounded-xl px-4 py-2.5">
-            <p className="text-sm font-semibold text-gray-800">{comment.user?.name}</p>
-            <p className="text-sm text-gray-700 mt-0.5">{comment.body}</p>
+          <div className="bg-slate-50 rounded-xl px-4 py-2.5 dark:bg-slate-800">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{comment.user?.name}</p>
+            <p className="text-sm text-slate-700 mt-0.5 dark:text-slate-300">{comment.body}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-1 ml-1">
-            <p className="text-xs text-gray-400">{formatDate(comment.created_at)}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{formatDate(comment.created_at)}</p>
             {canReply && depth < 3 && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="cursor-pointer text-xs text-blue-500 hover:text-blue-700 transition-colors"
+                className="cursor-pointer text-xs text-sky-600 hover:text-sky-800 transition-colors dark:text-sky-300 dark:hover:text-sky-200"
               >
-                {showReplyForm ? "Huy" : "Tra loi"}
+                {showReplyForm ? "Hủy" : "Trả lời"}
               </button>
             )}
           </div>
@@ -305,10 +301,9 @@ const CommentItem = ({
           postSlug={postSlug}
           parentId={comment.id}
           isAuthenticated={isAuthenticated}
-          currentUserName={currentUserName}
           onSuccess={handleReplySuccess}
           onCancel={() => setShowReplyForm(false)}
-          placeholder={`Tra loi ${comment.user?.name}...`}
+          placeholder={`Trả lời ${comment.user?.name}...`}
         />
       </div>
 
@@ -322,7 +317,6 @@ const CommentItem = ({
               depth={depth + 1}
               canReply={canReply}
               isAuthenticated={isAuthenticated}
-              currentUserName={currentUserName}
               onReplyAdded={onReplyAdded}
             />
           ))}
@@ -365,45 +359,44 @@ const Comment = ({ comments: initialComments, postSlug }: CommentProps) => {
   };
 
   return (
-    <div className="border-t border-gray-200 py-4 mt-4">
-      <h3 className="font-semibold text-gray-700 mb-4">{comments.length} binh luan</h3>
+    <div className="border-t border-slate-200 py-4 mt-4 dark:border-slate-700">
+      <h3 className="font-semibold text-slate-700 mb-4 dark:text-slate-200">{comments.length} bình luận</h3>
       {auth.isAuthenticated ? (
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+        <div className="flex items-center gap-2 text-sm text-slate-600 mb-2 dark:text-slate-300">
           {auth.avatar ? (
             <img
               src={auth.avatar}
-              alt={auth.name || "Nguoi dung"}
-              className="w-7 h-7 rounded-full object-cover border border-gray-200"
+              alt={auth.name || "Người dùng"}
+              className="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-600"
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-sky-100 text-sky-800 text-xs font-semibold flex items-center justify-center dark:bg-slate-700 dark:text-slate-100">
               {(auth.name?.charAt(0) || "N").toUpperCase()}
             </div>
           )}
           <p>
-            Dang nhap voi ten <span className="font-semibold text-gray-800">{auth.name || "Nguoi dung"}</span>
+            Đăng nhập với tên <span className="font-semibold text-slate-800 dark:text-slate-100">{auth.name || "Người dùng"}</span>
           </p>
         </div>
       ) : (
-        <p className="text-sm text-gray-600 mb-2">
-          Ban dang binh luan voi tu cach khach. Co the{" "}
-          <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-            dang nhap
+        <p className="text-sm text-slate-600 mb-2 dark:text-slate-300">
+          Bạn đang bình luận với tư cách khách. Có thể{" "}
+          <Link to="/login" className="text-sky-700 hover:text-sky-800 font-medium dark:text-sky-300 dark:hover:text-sky-200">
+            đăng nhập
           </Link>{" "}
-          de gui binh luan bang tai khoan.
+          để gửi bình luận bằng tài khoản.
         </p>
       )}
 
       <CommentForm
         postSlug={postSlug}
         isAuthenticated={auth.isAuthenticated}
-        currentUserName={auth.name}
         onSuccess={handleNewComment}
-        placeholder="Viet binh luan cua ban..."
+        placeholder="Viết bình luận của bạn..."
       />
 
       {comments.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-4">Chua co binh luan nao.</p>
+        <p className="text-center text-slate-400 text-sm py-4 dark:text-slate-500">Chưa có bình luận nào.</p>
       ) : (
         <div className="mt-4">
           {comments.map((comment) => (
@@ -413,7 +406,6 @@ const Comment = ({ comments: initialComments, postSlug }: CommentProps) => {
               postSlug={postSlug}
               canReply={true}
               isAuthenticated={auth.isAuthenticated}
-              currentUserName={auth.name}
               onReplyAdded={handleReplyAdded}
             />
           ))}
@@ -424,3 +416,5 @@ const Comment = ({ comments: initialComments, postSlug }: CommentProps) => {
 };
 
 export default Comment;
+
+

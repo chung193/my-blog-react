@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown, Clock3, FolderOpen, LogOut, Menu, MessageCircle, Moon, Sun, X } from "lucide-react";
 import Logo from "./Logo";
 import apiService from "../services/common";
-import { ChevronDown, Clock3, FolderOpen, LogOut, MessageCircle } from "lucide-react";
 
 interface MenuCategory {
   id?: number;
@@ -10,10 +10,32 @@ interface MenuCategory {
   name: string;
 }
 
+interface ApiEnvelope<T> {
+  data?: T;
+}
+
 type AuthProfile = {
   isAuthenticated: boolean;
   name: string;
   avatar: string;
+};
+
+type ThemeMode = "light" | "dark";
+
+interface HeaderProps {
+  theme: ThemeMode;
+  onToggleTheme: () => void;
+}
+
+const getResponseData = <T,>(response: ApiEnvelope<T | ApiEnvelope<T>> | undefined): T | null => {
+  const payload = response?.data;
+  if (!payload) return null;
+
+  if (typeof payload === "object" && payload !== null && "data" in payload) {
+    return (payload as ApiEnvelope<T>).data ?? null;
+  }
+
+  return payload as T;
 };
 
 const getAuthProfile = (): AuthProfile => {
@@ -55,14 +77,21 @@ const getAuthProfile = (): AuthProfile => {
   }
 };
 
-function Header() {
+function Header({ theme, onToggleTheme }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [auth, setAuth] = useState<AuthProfile>(() => getAuthProfile());
   const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
 
   useEffect(() => {
     setAuth(getAuthProfile());
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileCategoriesOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -72,7 +101,8 @@ function Header() {
       .get("client/category", { page: 1 })
       .then((response) => {
         if (!mounted) return;
-        const items = Array.isArray(response?.data?.data) ? response.data.data : [];
+        const categoryPayload = getResponseData<unknown[]>(response);
+        const items = Array.isArray(categoryPayload) ? categoryPayload : [];
         const mapped = items
           .filter((item: unknown): item is { id?: number; slug: string; name: string } => {
             if (!item || typeof item !== "object") return false;
@@ -99,122 +129,228 @@ function Header() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setAuth(getAuthProfile());
+    setMobileMenuOpen(false);
+    setMobileCategoriesOpen(false);
     navigate("/login");
   };
 
   return (
-    <header className="border-b border-gray-200">
-      <div className="max-w-4xl w-full mx-auto h-16 flex items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-sky-100 /95 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
+      <div className="mx-auto flex h-16 w-full max-w-4xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center space-x-2">
           <Logo />
         </div>
-        <nav>
-          <ul className="flex space-x-4 text-sm sm:text-base items-center h-full">
+
+        <div className="flex items-center gap-2 md:gap-3">
+          <nav className="hidden md:block">
+            <ul className="flex h-full items-center space-x-4 text-sm sm:text-base">
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-1.5 text-slate-700 transition-colors hover:text-sky-700 dark:text-slate-200 dark:hover:text-sky-300"
+                >
+                  <Clock3 className="h-4 w-4" />
+                  Mới nhất
+                </Link>
+              </li>
+              <li className="group relative flex h-full items-center">
+                <button className="flex h-full cursor-pointer items-center gap-1.5 text-slate-700 transition-colors hover:text-sky-700 dark:text-slate-200 dark:hover:text-sky-300">
+                  <FolderOpen className="h-4 w-4" />
+                  <span>Bài viết</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                <div className="invisible absolute right-0 top-[calc(100%+20px)] z-50 mt-0 w-56 rounded-b-lg border border-sky-100  py-1 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-900">
+                  {categories.slice(0, 8).map((category) => (
+                    <Link
+                      key={category.slug}
+                      to={`/category/${category.slug}`}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+
+                  {categories.length > 8 && (
+                    <Link
+                      to="/categories"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-sky-700 transition-colors hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-slate-800"
+                    >
+                      <FolderOpen className="h-4 w-4" />
+                      Xem tất cả danh mục
+                    </Link>
+                  )}
+                </div>
+              </li>
+              {!auth.isAuthenticated && (
+                <>
+                  <li>
+                    <Link
+                      to="/login"
+                      className="text-slate-700 transition-colors hover:text-sky-700 dark:text-slate-200 dark:hover:text-sky-300"
+                    >
+                      Đăng nhập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/register"
+                      className="text-slate-700 transition-colors hover:text-sky-700 dark:text-slate-200 dark:hover:text-sky-300"
+                    >
+                      Đăng ký
+                    </Link>
+                  </li>
+                </>
+              )}
+              {auth.isAuthenticated && (
+                <li className="group relative flex h-full items-center">
+                  <button className="flex h-full cursor-pointer items-center gap-2">
+                    {auth.avatar ? (
+                      <img
+                        src={auth.avatar}
+                        alt={auth.name || "Người dùng"}
+                        className="h-8 w-8 rounded-full border border-sky-200 object-cover dark:border-slate-600"
+                      />
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700 dark:bg-slate-700 dark:text-slate-100">
+                        {(auth.name?.charAt(0) || "N").toUpperCase()}
+                      </div>
+                    )}
+                    <span className="max-w-32 truncate text-slate-700 dark:text-slate-200">{auth.name || "Người dùng"}</span>
+                  </button>
+                  <div className="invisible absolute right-0 top-[calc(100%+16px)] z-50 mt-0 w-56 rounded-b-lg border border-sky-100  opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 dark:border-slate-700 dark:bg-slate-900">
+                    <Link
+                      to="/my-comments"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                    >
+                      <MessageCircle className="h-4 w-4 text-sky-600 dark:text-sky-300" />
+                      Xem bình luận đã gửi
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Đăng xuất
+                    </button>
+                  </div>
+                </li>
+              )}
+            </ul>
+          </nav>
+
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-sky-200 text-sky-700 transition-colors hover:bg-sky-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
+            aria-label={theme === "dark" ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-sky-200 text-sky-700 hover:bg-sky-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800 md:hidden"
+            aria-label={mobileMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="border-t border-sky-100  px-4 py-3 dark:border-slate-700 dark:bg-slate-900 md:hidden">
+          <ul className="flex flex-col gap-1 text-sm">
             <li>
-              <Link to="/" className="hover:text-gray-400 flex items-center gap-1.5">
-                <Clock3 className="w-4 h-4" />
+              <Link
+                to="/"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+              >
+                <Clock3 className="h-4 w-4" />
                 Mới nhất
               </Link>
             </li>
-            <li className="relative group h-full flex items-center">
-              <button className="hover:text-gray-400 cursor-pointer flex items-center gap-1.5 h-full">
-                <FolderOpen className="w-4 h-4" />
-                <span>Bài viết</span>
-                <ChevronDown className="w-4 h-4" />
+            <li>
+              <button
+                type="button"
+                onClick={() => setMobileCategoriesOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+              >
+                <span className="flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4" />
+                  Bài viết
+                </span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${mobileCategoriesOpen ? "rotate-180" : ""}`} />
               </button>
-              <div className="absolute right-0 top-[calc(100%+20px)] mt-0 w-56 bg-white border border-gray-200 rounded-b-lg shadow-lg py-1 z-50 opacity-0 invisible transition-all duration-150 group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible">
-
-                {categories.slice(0, 8).map((category) => (
-                  <Link
-                    key={category.slug}
-                    to={`/category/${category.slug}`}
-                    className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-
-                {categories.length > 8 && (
-                  <Link
-                    to="/categories"
-                    className="px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"
-                  >
-                    <FolderOpen className="w-4 h-4" />
-                    Xem tất cả danh mục
-                  </Link>
-                )}
-              </div>
+              {mobileCategoriesOpen && (
+                <div className="mt-1 pl-2">
+                  {categories.slice(0, 8).map((category) => (
+                    <Link
+                      key={category.slug}
+                      to={`/category/${category.slug}`}
+                      className="block rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                  {categories.length > 8 && (
+                    <Link
+                      to="/categories"
+                      className="block rounded-md px-3 py-2 text-sky-700 transition-colors hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-slate-800"
+                    >
+                      Xem tất cả danh mục
+                    </Link>
+                  )}
+                </div>
+              )}
             </li>
             {!auth.isAuthenticated && (
               <>
                 <li>
-                  <Link to="/login" className="hover:text-gray-400">
+                  <Link
+                    to="/login"
+                    className="block rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                  >
                     Đăng nhập
                   </Link>
                 </li>
                 <li>
-                  <Link to="/register" className="hover:text-gray-400">
+                  <Link
+                    to="/register"
+                    className="block rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                  >
                     Đăng ký
                   </Link>
                 </li>
               </>
             )}
             {auth.isAuthenticated && (
-              <li className="relative group h-full flex items-center">
-                <button className="flex items-center gap-2 cursor-pointer h-full">
-                  {auth.avatar ? (
-                    <img
-                      src={auth.avatar}
-                      alt={auth.name || "Người dùng"}
-                      className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center">
-                      {(auth.name?.charAt(0) || "N").toUpperCase()}
-                    </div>
-                  )}
-                  <span className="text-gray-700 max-w-32 truncate">{auth.name || "Người dùng"}</span>
-                </button>
-                <div className="absolute 
-                    right-0 
-                    top-[calc(100%+16px)] 
-                    mt-0 
-                    w-56 
-                    bg-white 
-                    border 
-                    border-gray-200 
-                    rounded-b-lg 
-                    shadow-lg 
-                    z-50 
-                    opacity-0 
-                    invisible 
-                    transition-all 
-                    duration-150 
-                    group-hover:opacity-100 
-                    group-hover:visible 
-                    group-focus-within:opacity-100 
-                    group-focus-within:visible"
-                >
+              <>
+                <li>
                   <Link
                     to="/my-comments"
-                    className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-md px-3 py-2 text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                   >
-                    <MessageCircle className="w-4 h-4 text-gray-500" />
+                    <MessageCircle className="h-4 w-4 text-sky-600 dark:text-sky-300" />
                     Xem bình luận đã gửi
                   </Link>
+                </li>
+                <li>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer flex items-center gap-2"
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="h-4 w-4" />
                     Đăng xuất
                   </button>
-                </div>
-              </li>
+                </li>
+              </>
             )}
           </ul>
-        </nav>
-      </div>
+        </div>
+      )}
     </header>
   );
 }

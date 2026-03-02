@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthCard from "./AuthCard";
@@ -63,7 +63,7 @@ function Register() {
       footer={
         <>
           Đã có tài khoản?{" "}
-          <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/login" className="text-sky-700 hover:text-sky-800 font-medium dark:text-sky-300 dark:hover:text-sky-200">
             Đăng nhập
           </Link>
         </>
@@ -71,7 +71,7 @@ function Register() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-            <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-name" className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
             Họ tên
           </label>
           <input
@@ -80,13 +80,13 @@ function Register() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             placeholder="Nguyen Van A"
           />
         </div>
 
         <div>
-          <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="register-email" className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
             Email
           </label>
           <input
@@ -95,13 +95,13 @@ function Register() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             placeholder="you@example.com"
           />
         </div>
 
         <div>
-            <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-password" className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
             Mật khẩu
           </label>
           <input
@@ -111,13 +111,13 @@ function Register() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             placeholder="Tối thiểu 6 ký tự"
           />
         </div>
 
         <div>
-            <label htmlFor="register-password-confirm" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="register-password-confirm" className="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">
             Xác nhận mật khẩu
           </label>
           <input
@@ -127,17 +127,17 @@ function Register() {
             onChange={(e) => setPasswordConfirmation(e.target.value)}
             required
             minLength={6}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             placeholder="Nhập lại mật khẩu"
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-sky-700">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-blue-600 text-white py-2.5 font-medium hover:bg-blue-700 disabled:opacity-60"
+          className="w-full rounded-lg bg-sky-600 text-white py-2.5 font-medium hover:bg-sky-700 disabled:opacity-60"
         >
           {loading ? "Đang xử lý..." : "Đăng ký"}
         </button>
@@ -147,4 +147,5 @@ function Register() {
 }
 
 export default Register;
+
 

@@ -1,3 +1,4 @@
+﻿import { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "./components/Header";
@@ -15,14 +16,37 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import MyComments from "./components/MyComments";
 
+type ThemeMode = "light" | "dark";
+
+const getInitialTheme = (): ThemeMode => {
+  const savedTheme = localStorage.getItem("theme-mode");
+  if (savedTheme === "light" || savedTheme === "dark") {
+    return savedTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
+
 function App() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const authPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
   const isAuthPage = authPaths.includes(location.pathname);
+  const [theme, setTheme] = useState<ThemeMode>(() => getInitialTheme());
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const isDark = theme === "dark";
+    root.classList.toggle("dark", isDark);
+    localStorage.setItem("theme-mode", theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
       {isHome && (
         <Helmet>
           <title>Tran tro cua 1 nguoi kho o</title>
@@ -32,7 +56,7 @@ function App() {
         </Helmet>
       )}
 
-      <Header />
+      <Header theme={theme} onToggleTheme={handleToggleTheme} />
       {!isAuthPage && (
         <DonateButton
           imageUrl="/donate.gif"
