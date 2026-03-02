@@ -164,7 +164,7 @@ function Header({ theme, onToggleTheme }: HeaderProps) {
                     <Link
                       key={category.slug}
                       to={`/category/${category.slug}`}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                      className=" flex items-center gap-2 px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                     >
                       {category.name}
                     </Link>

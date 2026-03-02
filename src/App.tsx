@@ -46,7 +46,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen flex flex-col text-slate-900 bg-white dark:bg-slate-950 dark:text-slate-100 transition-colors">
       {isHome && (
         <Helmet>
           <title>Tran tro cua 1 nguoi kho o</title>
