@@ -10,6 +10,7 @@ import PostDetail from "./components/PostDetail";
 import Category from "./components/Category";
 import Categories from "./components/Categories";
 import PostWithUser from "./components/PostWithUser";
+import Tag from "./components/Tag";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
@@ -72,6 +73,7 @@ function App() {
           <Route path="/category/:slug" element={<Category />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/user/:slug" element={<PostWithUser />} />
+          <Route path="/tag/:slug" element={<Tag />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

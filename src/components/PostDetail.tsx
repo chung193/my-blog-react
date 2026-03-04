@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import apiService from '../services/common'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Comment from './Comment'
 import { Helmet } from "react-helmet-async";
 import Waiting from './Waiting';
@@ -22,6 +22,12 @@ interface Category {
     slug?: string;
 }
 
+interface Tag {
+    id?: number;
+    slug?: string;
+    name: string;
+}
+
 interface PostDetailData {
     id: number;
     slug?: string;
@@ -33,6 +39,7 @@ interface PostDetailData {
     content: string;
     user?: User;
     category?: Category;
+    tags?: Tag[];
     comments?: unknown;
 }
 
@@ -143,21 +150,34 @@ function PostDetail() {
                 <article className="p-4 dark:border-slate-700">
                     <h6 className='text-1xl mt-2 mb-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'>
                         <strong>
-                            <a href={`/category/${post.category?.slug || post.category?.id}`} className='inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700 transition-colors hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-300 dark:border-slate-600 dark:bg-slate-800 dark:text-sky-300 dark:hover:border-slate-500 dark:hover:bg-slate-700'>
+                            <Link to={`/category/${post.category?.slug || post.category?.id}`} className='inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700 transition-colors hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-300 dark:border-slate-600 dark:bg-slate-800 dark:text-sky-300 dark:hover:border-slate-500 dark:hover:bg-slate-700'>
                                 {post.category?.name || "Uncategorized"}
-                            </a>
+                            </Link>
                         </strong>
                     </h6>
                     <h1 className='text-2xl sm:text-3xl mt-2 mb-2 font-bold leading-tight dark:text-slate-100'>{post.name}</h1>
                     <img src={post.avatar} className="rounded-lg" />
                     <p className="mt-2 text-slate-700 font-bold my-2 dark:text-slate-300">{post.description}</p>
+                    {Array.isArray(post.tags) && post.tags.length > 0 && (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                            {post.tags.map((tag) => (
+                                <Link
+                                    key={tag.slug || tag.id || tag.name}
+                                    to={tag.slug ? `/tag/${encodeURIComponent(tag.slug)}` : `/?tag=${encodeURIComponent(tag.name)}`}
+                                    className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 transition-colors hover:border-emerald-300 hover:bg-emerald-100 hover:text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:bg-emerald-500/20"
+                                >
+                                    #{tag.name}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                     <div
                         className="post-content prose prose-sm sm:prose max-w-none overflow-hidden dark:prose-invert [&_img]:max-w-full [&_img]:h-auto [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_table]:block [&_table]:overflow-x-auto"
                         dangerouslySetInnerHTML={{ __html: post.content.replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ') }}
                     />
                     <div className="mt-4 mb-1">
-                        <a
-                            href={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}
+                        <Link
+                            to={`/user/${post.user?.slug || (post.user?.name ? toSlug(post.user.name) : post.user?.id)}`}
                             className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-white to-slate-50 px-3 py-2 transition-colors hover:from-sky-50 hover:to-white dark:from-slate-900 dark:to-slate-800 dark:hover:from-slate-800 dark:hover:to-slate-900"
                         >
                             {getAuthorAvatar(post) ? (
@@ -177,7 +197,7 @@ function PostDetail() {
                                     {post.user?.name || "Unknown Author"}
                                 </p>
                             </div>
-                        </a>
+                        </Link>
                     </div>
                     <Comment key={slug} comments={comments} postSlug={slug || ""} />
                 </article>

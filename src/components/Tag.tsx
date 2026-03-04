@@ -23,14 +23,13 @@ interface PostRow {
   tags?: TagRow[];
 }
 
-function Category() {
+function Tag() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState<PostRow[] | null>(null);
   const [tags, setTags] = useState<TagRow[]>([]);
-  const [categoryTitle, setCategoryTitle] = useState("");
+  const [tagTitle, setTagTitle] = useState("");
   const [searchInput, setSearchInput] = useState(() => searchParams.get("search") || "");
   const [search, setSearch] = useState(() => searchParams.get("search") || "");
-  const [selectedTag, setSelectedTag] = useState(() => searchParams.get("tag") || "");
   const didInitFilters = useRef(false);
   const [page, setPage] = useState(() => {
     const parsed = Number(searchParams.get("page") || "1");
@@ -41,13 +40,11 @@ function Category() {
 
   useEffect(() => {
     const nextSearch = searchParams.get("search") || "";
-    const nextTag = searchParams.get("tag") || "";
     const parsedPage = Number(searchParams.get("page") || "1");
     const nextPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
     setSearchInput((prev) => (prev === nextSearch ? prev : nextSearch));
     setSearch((prev) => (prev === nextSearch ? prev : nextSearch));
-    setSelectedTag((prev) => (prev === nextTag ? prev : nextTag));
     setPage((prev) => (prev === nextPage ? prev : nextPage));
   }, [searchParams]);
 
@@ -65,15 +62,14 @@ function Category() {
       return;
     }
     setPage(1);
-  }, [search, selectedTag, slug]);
+  }, [search, slug]);
 
   useEffect(() => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (selectedTag) params.set("tag", selectedTag);
     if (page > 1) params.set("page", String(page));
     setSearchParams(params, { replace: true });
-  }, [search, selectedTag, page, setSearchParams]);
+  }, [search, page, setSearchParams]);
 
   useEffect(() => {
     apiService
@@ -88,32 +84,37 @@ function Category() {
   }, []);
 
   useEffect(() => {
-    const params: Record<string, string | number> = { page, category_slug: slug || "" };
-    if (search) params.search = search;
-    if (selectedTag) params.tag_slug = selectedTag;
-
     apiService
-      .get("client/post", params)
+      .get("client/post", { tag_slug: slug, search, page })
       .then((response) => {
         const rows = Array.isArray(response?.data?.data) ? response.data.data : [];
         setPosts(rows);
         setPage(response?.data?.meta?.current_page ?? 1);
         setTotalPages(response?.data?.meta?.last_page ?? 0);
+
+        const matchedTag = rows
+          .flatMap((post: PostRow) => (Array.isArray(post.tags) ? post.tags : []))
+          .find((tag: TagRow) => tag.slug === slug);
+
         const fallbackTitle = (slug || "").replace(/-/g, " ");
-        setCategoryTitle(response?.data?.meta?.category_name || rows?.[0]?.category?.name || fallbackTitle);
+        setTagTitle(matchedTag?.name || fallbackTitle);
       })
       .catch((error) => {
-        console.error("Error fetching posts:", error);
+        console.error("Error fetching posts by tag:", error);
         setPosts([]);
       });
-  }, [slug, page, search, selectedTag]);
+  }, [slug, search, page]);
 
   const buildTagLink = (tagSlug: string): string => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (tagSlug) params.set("tag", tagSlug);
     const query = params.toString();
-    return query ? `/category/${slug}?${query}` : `/category/${slug}`;
+
+    if (!tagSlug) {
+      return query ? `/?${query}` : "/";
+    }
+
+    return query ? `/tag/${tagSlug}?${query}` : `/tag/${tagSlug}`;
   };
 
   if (!posts) return <Waiting />;
@@ -124,12 +125,12 @@ function Category() {
         searchInput={searchInput}
         onSearchInputChange={setSearchInput}
         tags={tags}
-        selectedTag={selectedTag}
+        selectedTag={slug || ""}
         buildTagLink={buildTagLink}
       />
 
       <section className="rounded-2xl p-4 sm:p-5 dark:border-slate-800">
-        <h1 className="mb-4 text-2xl font-bold text-slate-800 dark:text-slate-100 sm:text-3xl">Danh mục: {categoryTitle || "..."}</h1>
+        <h1 className="mb-4 text-2xl font-bold text-slate-800 dark:text-slate-100 sm:text-3xl">Tag: {tagTitle || "..."}</h1>
         {posts.map((post) => (
           <Post
             key={post.slug || post.id}
@@ -145,7 +146,7 @@ function Category() {
           />
         ))}
         {posts.length === 0 && (
-          <p className="mb-4 text-slate-600 dark:text-slate-300">Không tìm thấy bài viết phù hợp.</p>
+          <p className="mb-4 text-slate-600 dark:text-slate-300">Không tìm thấy bài viết cho tag này.</p>
         )}
         <Pagination currentPage={page} totalPages={totalPages} onPageChange={(p) => setPage(p)} />
       </section>
@@ -153,4 +154,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default Tag;
