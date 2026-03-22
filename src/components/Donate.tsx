@@ -9,10 +9,9 @@ interface DonateButtonProps {
 export default function DonateButton({
     imageUrl,
     donateUrl,
-    tooltip = "Ủng hộ tôi ☕",
+    tooltip = "Ủng hộ dự án nuôi anh 1 cốc ☕",
 }: DonateButtonProps) {
     const [visible, setVisible] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setVisible(true), 500);
@@ -27,20 +26,15 @@ export default function DonateButton({
                 ${visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}
             `}
         >
-            {/* Tooltip */}
-            {showTooltip && (
-                <div className="
-                    hidden sm:block
+            <div className="hidden sm:block
                     absolute right-20 top-1/2 -translate-y-1/2
-                    text-white text-xs
+                    dark:text-slate-200 text-xs
                     px-3 py-1.5 whitespace-nowrap
                     before:content-[''] before:absolute before:left-full before:top-1/2
-                    before:-translate-y-1/2
-                ">
-                    {tooltip}
-                </div>
-            )}
-
+                    before:-translate-y-1/2"
+            >
+                {tooltip}
+            </div>
             {/* Button */}
             <a
                 href={donateUrl}
@@ -48,12 +42,9 @@ export default function DonateButton({
                 rel="noopener noreferrer"
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
-                className="
-            block w-14 h-14 sm:w-20 sm:h-20
-            
-            overflow-hidden cursor-pointer
-            transition-all duration-200
-            "
+                className="block w-14 h-14 sm:w-20 sm:h-20
+                overflow-hidden cursor-pointer
+                transition-all duration-200"
             >
                 <img
                     src={imageUrl}

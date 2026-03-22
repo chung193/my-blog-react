@@ -62,7 +62,7 @@ function App() {
         <DonateButton
           imageUrl="/donate.gif"
           donateUrl="https://me.momo.vn/yourname"
-          tooltip="Mời anh ly cafe ☕"
+          tooltip="Ủng hộ dự án nuôi anh ly cafe ☕"
         />
       )}
 
